@@ -148,11 +148,11 @@ function finity.new(isdark, gprojectName, thinProject)
 	self2.ChangeToggleKey = function(NewKey)
 		finityData.ToggleKey = NewKey
 		
-        getgenv().FinityWindow.CustomHeader = false
+        getgenv().KrystekCustomHeader = false
         getgenv().CustomHeader = "Testowa wiadomosc"
 
 		if not projectName then
-            if FinityWindow.CustomHeader == true then
+            if KrystekCustomHeader == true then
                 self2.tip.Text = CustomHeader
             else
                 self2.tip.Text = "Press '".. string.sub(tostring(NewKey), 14) .."' to hide this menu"
