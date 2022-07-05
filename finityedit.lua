@@ -147,9 +147,6 @@ function finity.new(isdark, gprojectName, thinProject)
 
 	self2.ChangeToggleKey = function(NewKey)
 		finityData.ToggleKey = NewKey
-		
-        getgenv().KrystekCustomHeader = false
-        getgenv().CustomHeader = "Testowa wiadomosc"
 
 		if not projectName then
             if KrystekCustomHeader == true then
