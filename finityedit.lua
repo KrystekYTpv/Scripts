@@ -151,8 +151,12 @@ function finity.new(isdark, gprojectName, thinProject)
 		if not projectName then
             if getgenv().KrystekCustomHeader == true then
                 self2.tip.Text = getgenv().CustomHeader
+                print("1CustomHeader: ", CustomHeader)
+                print("1KrystekCustomHeader: ", KrystekCustomHeader)
             elseif getgenv().KrystekCustomHeader == false then
                 self2.tip.Text = "Press '".. string.sub(tostring(NewKey), 14) .."' to hide this menu"
+                print("1CustomHeader: ", CustomHeader)
+                print("1KrystekCustomHeader: ", KrystekCustomHeader)
             end
 		end
 		
@@ -277,8 +281,14 @@ function finity.new(isdark, gprojectName, thinProject)
 	if projectName then
         if getgenv().KrystekCustomHeader == true then
             self2.tip.Text = getgenv().CustomHeader
+            print("projectName Yes")
+            print("CustomHeader: ", CustomHeader)
+            print("KrystekCustomHeader: ", KrystekCustomHeader)
         elseif getgenv().KrystekCustomHeader == false then
             self2.tip.Text = "Press '".. string.sub(tostring(NewKey), 14) .."' to hide this menu"
+            print("projectName No")
+            print("CustomHeader: ", CustomHeader)
+            print("KrystekCustomHeader: ", KrystekCustomHeader)
         end
 	end
     
