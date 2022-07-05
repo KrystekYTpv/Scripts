@@ -275,9 +275,11 @@ function finity.new(isdark, gprojectName, thinProject)
 	})
 	
 	if projectName then
-		self2.tip.Text = projectName
-	else
-		self2.tip.Text = "Press '".. string.sub(tostring(self.ToggleKey), 14) .."' to hide this menu"
+        if getgenv().KrystekCustomHeader == true then
+            self2.tip.Text = getgenv().CustomHeader
+        elseif getgenv().KrystekCustomHeader == false then
+            self2.tip.Text = "Press '".. string.sub(tostring(NewKey), 14) .."' to hide this menu"
+        end
 	end
     
     function finity.settitle(text)
