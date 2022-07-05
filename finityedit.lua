@@ -148,6 +148,9 @@ function finity.new(isdark, gprojectName, thinProject)
 	self2.ChangeToggleKey = function(NewKey)
 		finityData.ToggleKey = NewKey
 		
+        getgenv().FinityWindow.CustomHeader = false
+        getgenv().CustomHeader = "Testowa wiadomosc"
+
 		if not projectName then
             if FinityWindow.CustomHeader == true then
                 self2.tip.Text = CustomHeader
