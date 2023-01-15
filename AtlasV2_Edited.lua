@@ -182,15 +182,15 @@ Library.BlankFunction = function() end
 function Library:CreateWindow(LibArgs)
     Library:Require(LibArgs.Name,"Missing arguments for Library:CreateWindow")
 
-    LibArgs.Watermark = LibArgs.Watermark or LibArgs.Name or "Atlas"
-    -- This is a watermark that will be saved to your config file (does not interfere with script whatsoever). The purpose of this is to let people know what UI library they are using in case they want to use it themselves, please don't remove it :)
-    local FlagWatermark, SiegeInvite = "Atlas v2 made by Siege Scripting Utilities","https://discord.gg/rWHQSvDcc3"
-    local Configs = {
-        [FlagWatermark] = SiegeInvite;
-    }
-    local RegisteredFlags = {
-        [FlagWatermark] = true
-    }
+    --LibArgs.Watermark = LibArgs.Watermark or LibArgs.Name or "Atlas"
+    ---- This is a watermark that will be saved to your config file (does not interfere with script whatsoever). The purpose of this is to let people know what UI library they are using in case they want to use it themselves, please don't remove it :)
+    --local FlagWatermark, SiegeInvite = "Atlas v2 made by Siege Scripting Utilities","https://discord.gg/rWHQSvDcc3"
+    --local Configs = {
+    --    [FlagWatermark] = SiegeInvite;
+    --}
+    --local RegisteredFlags = {
+    --    [FlagWatermark] = true
+    --}
 
     local connections = {}
 
@@ -286,7 +286,7 @@ function Library:CreateWindow(LibArgs)
 
     startDragging(UI.Keybinds,UI.Keybinds)
 
-    UI.Watermark.Active = false
+    UI.Watermark.Active = true
     startDragging(UI.Watermark,UI.Watermark)
 
     local Window = {
