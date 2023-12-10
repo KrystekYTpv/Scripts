@@ -1916,73 +1916,63 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			function DropdownSettings:Set(NewOption)
-    -- Ustawienie bieżącej opcji i jej konwersja do formatu tabeli, jeśli to konieczne
-    if typeof(NewOption) == "string" then
-        NewOption = {NewOption}
-    end
-
-    -- Dodanie nowych opcji do listy rozwijanej, jeśli nie istnieją
-    for _, option in ipairs(NewOption) do
-        local exists = false
-        for _, droption in ipairs(Dropdown.List:GetChildren()) do
-            if droption.ClassName == "Frame" and droption.Name == option then
-                exists = true
-                break
+                -- Konwersja NewOption na tabelę, jeśli to konieczne
+                if typeof(NewOption) == "string" then
+                    NewOption = {NewOption}
+                end
+            
+                -- Dodanie nowych opcji do listy rozwijanej, jeśli nie istnieją
+                for _, option in ipairs(NewOption) do
+                    local exists = false
+                    for _, droption in ipairs(Dropdown.List:GetChildren()) do
+                        if droption.ClassName == "Frame" and droption.Name == option then
+                            exists = true
+                            break
+                        end
+                    end
+                    if not exists then
+                        local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
+                        DropdownOption.Name = option
+                        DropdownOption.Title.Text = option
+                        DropdownOption.Parent = Dropdown.List
+                        DropdownOption.Visible = true
+                        -- Tutaj możesz dodać dodatkową konfigurację dla nowej opcji
+                    end
+                end
+            
+                -- Aktualizacja CurrentOption w zależności od tego, czy dopuszczane są MultipleOptions
+                DropdownSettings.CurrentOption = NewOption
+                if DropdownSettings.MultipleOptions then
+                    if #DropdownSettings.CurrentOption == 1 then
+                        Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                    elseif #DropdownSettings.CurrentOption == 0 then
+                        Dropdown.Selected.Text = "None"
+                    else
+                        Dropdown.Selected.Text = "Various"
+                    end
+                else
+                    Dropdown.Selected.Text = DropdownSettings.CurrentOption[1] or "None"
+                end
+            
+                -- Wywołanie Callback, jeśli istnieje
+                if DropdownSettings.Callback then
+                    local Success, Response = pcall(function()
+                        DropdownSettings.Callback(NewOption)
+                    end)
+                    if not Success then
+                        -- Obsługa błędów związanych z Callback
+                        -- Istniejący kod obsługi błędów
+                    end
+                end
+            
+                -- Aktualizacja UI dla każdej opcji w Dropdown
+                for _, droption in ipairs(Dropdown.List:GetChildren()) do
+                    if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
+                        droption.BackgroundColor3 = table.find(DropdownSettings.CurrentOption, droption.Name) and Color3.fromRGB(40, 40, 40) or Color3.fromRGB(30, 30, 30)
+                    end
+                end
+                -- Opcjonalnie: SaveConfiguration()
             end
-        end
-        if not exists then
-            local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
-            DropdownOption.Name = option
-            DropdownOption.Title.Text = option
-            DropdownOption.Parent = Dropdown.List
-            DropdownOption.Visible = true
-            -- Tutaj możesz dodać dodatkową konfigurację dla nowej opcji
-        end
-    end
-
-    -- Aktualizacja bieżącej opcji w zależności od tego, czy dopuszczane są wielokrotne opcje
-    if DropdownSettings.MultipleOptions then
-        DropdownSettings.CurrentOption = NewOption
-        if #DropdownSettings.CurrentOption == 1 then
-            Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-        elseif #DropdownSettings.CurrentOption == 0 then
-            Dropdown.Selected.Text = "None"
-        else
-            Dropdown.Selected.Text = "Various"
-        end
-    else
-        DropdownSettings.CurrentOption = {NewOption[1]}
-        Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-    end
-end
-
-
-
-				local Success, Response = pcall(function()
-					DropdownSettings.Callback(NewOption)
-				end)
-				if not Success then
-					TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
-					TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
-					Dropdown.Title.Text = "Callback Error"
-					print("Rayfield | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
-					wait(0.5)
-					Dropdown.Title.Text = DropdownSettings.Name
-					TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-					TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
-				end
-
-				for _, droption in ipairs(Dropdown.List:GetChildren()) do
-					if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
-						if not table.find(DropdownSettings.CurrentOption, droption.Name) then
-							droption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-						else
-							droption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-						end
-					end
-				end
-				--SaveConfiguration()
-			end
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
