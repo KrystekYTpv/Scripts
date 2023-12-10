@@ -8,7 +8,7 @@ iRay  | Programming
 
 ]]
 
-print('Wersja 1.1')
+print('Wersja 1.2')
 
 
 local Release = "Beta 8"
@@ -1917,28 +1917,36 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			function DropdownSettings:Set(NewOption)
-                -- Konwersja NewOption na tabelę, jeśli to konieczne
                 if typeof(NewOption) == "string" then
                     NewOption = {NewOption}
                 end
             
-                -- Dodanie nowych opcji do listy rozwijanej, jeśli nie istnieją
+                -- Usuwanie istniejących opcji, jeśli to konieczne
+                for _, child in ipairs(Dropdown.List:GetChildren()) do
+                    if child:IsA("Frame") and child.Name ~= "Placeholder" then
+                        child:Destroy()
+                    end
+                end
+            
+                -- Dodawanie nowych opcji
                 for _, option in ipairs(NewOption) do
-                    local exists = false
-                    for _, droption in ipairs(Dropdown.List:GetChildren()) do
-                        if droption.ClassName == "Frame" and droption.Name == option then
-                            exists = true
-                            break
-                        end
-                    end
-                    if not exists then
-                        local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
-                        DropdownOption.Name = option
-                        DropdownOption.Title.Text = option
-                        DropdownOption.Parent = Dropdown.List
-                        DropdownOption.Visible = true
-                        -- Tutaj możesz dodać dodatkową konfigurację dla nowej opcji
-                    end
+                    local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
+                    DropdownOption.Name = option
+                    DropdownOption.Title.Text = option
+                    DropdownOption.Parent = Dropdown.List
+                    DropdownOption.Visible = true
+            
+                    -- Konfiguracja zdarzenia kliknięcia dla każdej opcji
+                    -- (tutaj dodaj logikę zdarzeń)
+                end
+            
+                -- Aktualizacja wybranej opcji
+                if DropdownSettings.MultipleOptions then
+                    DropdownSettings.CurrentOption = NewOption
+                    -- Logika aktualizacji tekstu wybranej opcji
+                else
+                    Dropdown.Selected.Text = NewOption[1] or "None"
+                    DropdownSettings.CurrentOption = {NewOption[1]}
                 end
             
                 -- Aktualizacja CurrentOption w zależności od tego, czy dopuszczane są MultipleOptions
