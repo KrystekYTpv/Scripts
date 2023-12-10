@@ -8,6 +8,7 @@ iRay  | Programming
 
 ]]
 
+print('Wersja 1.1')
 
 
 local Release = "Beta 8"
