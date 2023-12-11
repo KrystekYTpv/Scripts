@@ -2303,7 +2303,7 @@ function ArrayFieldLibrary:CreateWindow(Settings)
 					end
 
 					local Success, Response = pcall(function()
-						DropdownSettings.Callback({Option})
+						DropdownSettings.Callback(DropdownSettings.Items.Selected)
 					end)
 					if not Success then
 						Error('Callback Error')
@@ -2476,6 +2476,7 @@ function ArrayFieldLibrary:CreateWindow(Settings)
 			return DropdownSettings
 		end
 
+		
 		-- Keybind
 		function Tab:CreateKeybind(KeybindSettings)
 			local CheckingForKey = false
