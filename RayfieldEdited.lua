@@ -1926,7 +1926,41 @@ function RayfieldLibrary:CreateWindow(Settings)
 						child:Destroy()
 					end
 				end
-			
+	
+				if not DropdownSettings.MultipleOptions then
+					DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption[1]}
+				end
+	
+				if DropdownSettings.MultipleOptions then
+					if #DropdownSettings.CurrentOption == 1 then
+						Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+					elseif #DropdownSettings.CurrentOption == 0 then
+						Dropdown.Selected.Text = "None"
+					else
+						Dropdown.Selected.Text = "Various"
+					end
+				else
+					Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+				end
+	
+	
+				Dropdown.BackgroundTransparency = 1
+				Dropdown.UIStroke.Transparency = 1
+				Dropdown.Title.TextTransparency = 1
+	
+				Dropdown.Size = UDim2.new(1, -10, 0, 45)
+	
+				TweenService:Create(Dropdown, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {BackgroundTransparency = 0}):Play()
+				TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
+				TweenService:Create(Dropdown.Title, TweenInfo.new(0.7, Enum.EasingStyle.Quint), {TextTransparency = 0}):Play()	
+	
+				for _, ununusedoption in ipairs(Dropdown.List:GetChildren()) do
+					if ununusedoption.ClassName == "Frame" and ununusedoption.Name ~= "Placeholder" then
+						ununusedoption:Destroy()
+					end
+				end
+
+
 				Dropdown.Toggle.Rotation = 180
 
 				Dropdown.Interact.MouseButton1Click:Connect(function()
@@ -1965,13 +1999,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 						end
 					end
 				end)
-			
+
 				Dropdown.MouseEnter:Connect(function()
 					if not Dropdown.List.Visible then
 						TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
 					end
 				end)
-			
+
 				Dropdown.MouseLeave:Connect(function()
 					TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 				end)
