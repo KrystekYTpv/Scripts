@@ -1917,44 +1917,36 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			function DropdownSettings:Set(NewOption)
-                DropdownSettings.CurrentOption = NewOption
+                local CurrentOption = type(NewOption) == "table" and NewOption or {NewOption}
               
-                if type(DropdownSettings.CurrentOption) == "string" then
-                  DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption}
-                end
-              
-                -- Usuń stare opcje z tabeli
-                for _, Option in ipairs(DropdownSettings.CurrentOption) do
+                -- Remove existing options from the table
+                for _, Option in ipairs(CurrentOption) do
                   if Option ~= NewOption then
-                    DropdownSettings.CurrentOption[Option] = nil
+                    CurrentOption[Option] = nil
                   end
-                end
-            
-                -- Dodaj nowe opcje do tabeli
-                if type(NewOption) == "table" then
-                  for _, Option in ipairs(NewOption) do
-                    DropdownSettings.CurrentOption[Option] = true
-                  end
-                else
-                  DropdownSettings.CurrentOption[NewOption] = true
-                end
-
-                if not DropdownSettings.MultipleOptions then
-                  DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption[1]}
                 end
               
+                -- Add new options to the table
+                CurrentOption = type(NewOption) == "table" and CurrentOption or {CurrentOption[1]}
+              
+                if not DropdownSettings.MultipleOptions then
+                  CurrentOption = {CurrentOption[1]}
+                end
+              
+                -- Update the selected option text
                 if DropdownSettings.MultipleOptions then
-                  if #DropdownSettings.CurrentOption == 1 then
-                    Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-                  elseif #DropdownSettings.CurrentOption == 0 then
+                  if #CurrentOption == 1 then
+                    Dropdown.Selected.Text = CurrentOption[1]
+                  elseif #CurrentOption == 0 then
                     Dropdown.Selected.Text = "None"
                   else
                     Dropdown.Selected.Text = "Various"
                   end
                 else
-                  Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                  Dropdown.Selected.Text = CurrentOption[1]
                 end
               
+                -- Update the callback function
                 local Success, Response = pcall(function()
                   DropdownSettings.Callback(NewOption)
                 end)
@@ -1970,9 +1962,10 @@ function RayfieldLibrary:CreateWindow(Settings)
                   TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
                 end
               
+                -- Update the option background colors
                 for _, droption in ipairs(Dropdown.List:GetChildren()) do
                   if droption:IsA("Frame") and droption.Name ~= "Placeholder" then
-                    if not table.find(DropdownSettings.CurrentOption, droption.Name) then
+                    if not table.find(CurrentOption, droption.Name) then
                       droption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
                     else
                       droption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -1980,8 +1973,10 @@ function RayfieldLibrary:CreateWindow(Settings)
                   end
                 end
               
+                -- Save configuration
                 -- SaveConfiguration()
-            end
+              end
+              
               
 
 			if Settings.ConfigurationSaving then
