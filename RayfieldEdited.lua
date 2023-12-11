@@ -8,7 +8,7 @@ iRay  | Programming
 
 ]]
 
-warn(1.3)
+print('1.4')
 
 local Release = "Beta 8"
 local NotificationDuration = 6.5
@@ -1921,13 +1921,21 @@ function RayfieldLibrary:CreateWindow(Settings)
                     NewOption = {NewOption}
                 end
             
+                -- Przed dodaniem nowych opcji, usuń wszystkie stare
+                for _, child in ipairs(Dropdown.List:GetChildren()) do
+                    if child:IsA("Frame") and child.Name ~= "Placeholder" and child.Name ~= "Template" then
+                        child:Destroy()
+                    end
+                end
+            
+                -- Dodawanie nowych opcji
                 for _, option in ipairs(NewOption) do
                     local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
                     DropdownOption.Name = option
                     DropdownOption.Title.Text = option
                     DropdownOption.Parent = Dropdown.List
                     DropdownOption.Visible = true
-                
+            
                     -- Konfiguracja zdarzenia kliknięcia dla każdej opcji
                     DropdownOption.Interact.MouseButton1Click:Connect(function()
                         if DropdownSettings.MultipleOptions then
@@ -1939,7 +1947,7 @@ function RayfieldLibrary:CreateWindow(Settings)
                                 table.insert(DropdownSettings.CurrentOption, option)
                                 DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
                             end
-                
+            
                             -- Aktualizacja wyświetlanego tekstu dla wielokrotnych opcji
                             if #DropdownSettings.CurrentOption == 0 then
                                 Dropdown.Selected.Text = "None"
@@ -1957,7 +1965,7 @@ function RayfieldLibrary:CreateWindow(Settings)
                                 end
                             end
                             DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                
+            
                             -- Ustawienie tekstu wybranej opcji
                             Dropdown.Selected.Text = option
                         end
@@ -1971,13 +1979,13 @@ function RayfieldLibrary:CreateWindow(Settings)
                     end)
                     if not Success then
                         TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
-						TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
-						Dropdown.Title.Text = "Callback Error"
-						print("Rayfield | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
-						wait(0.5)
-						Dropdown.Title.Text = DropdownSettings.Name
-						TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-						TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
+                        TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
+                        Dropdown.Title.Text = "Callback Error"
+                        print("Rayfield | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
+                        wait(0.5)
+                        Dropdown.Title.Text = DropdownSettings.Name
+                        TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+                        TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
                     end
                 end
             
@@ -1989,15 +1997,16 @@ function RayfieldLibrary:CreateWindow(Settings)
                 end
                 -- Opcjonalnie: SaveConfiguration()
             end
-
-			if Settings.ConfigurationSaving then
-				if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
-					RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
-				end
-			end
-
-			return DropdownSettings
-		end
+            
+            if Settings.ConfigurationSaving then
+                if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
+                    RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
+                end
+            end
+            
+            return DropdownSettings
+            end
+            
 
 		-- Keybind
 		function Tab:CreateKeybind(KeybindSettings)
