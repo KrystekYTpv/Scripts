@@ -10,6 +10,7 @@ iRay  | Programming
 
 print(math.random(1,99))
 
+
 local Release = "Beta 8"
 local NotificationDuration = 6.5
 local RayfieldFolder = "Rayfield"
@@ -1916,75 +1917,65 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			function DropdownSettings:Set(NewOption)
-                -- Konwersja NewOption na tabelę, jeśli to konieczne
-                if typeof(NewOption) == "string" then
-                    NewOption = {NewOption}
+                DropdownSettings.CurrentOption = NewOption
+              
+                if type(DropdownSettings.CurrentOption) == "string" then
+                  DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption}
                 end
-            
-                -- Usuń stare opcje, które nie są już potrzebne
-                for _, child in ipairs(Dropdown.List:GetChildren()) do
-                    if child:IsA("Frame") and child.Name ~= "Placeholder" and not table.find(NewOption, child.Name) then
-                        child:Destroy()
-                    end
+              
+                if not DropdownSettings.MultipleOptions then
+                  DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption[1]}
                 end
-            
-                -- Dodaj lub aktualizuj opcje
-                for _, option in ipairs(NewOption) do
-                    local existingOption = Dropdown.List:FindFirstChild(option)
-                    if not existingOption then
-                        -- Tworzenie nowej opcji, jeśli nie istnieje
-                        local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
-                        DropdownOption.Name = option
-                        DropdownOption.Title.Text = option
-                        DropdownOption.Parent = Dropdown.List
-                        DropdownOption.Visible = true
-            
-                        -- Konfiguracja zdarzeń dla nowej opcji
-                        local InteractButton = DropdownOption:FindFirstChild("Interact")
-                        if InteractButton then
-                            InteractButton.MouseButton1Click:Connect(function()
-                                -- Logika obsługi wyboru opcji
-                                if DropdownSettings.MultipleOptions then
-                                    if table.find(DropdownSettings.CurrentOption, option) then
-                                        table.remove(DropdownSettings.CurrentOption, table.find(DropdownSettings.CurrentOption, option))
-                                    else
-                                        table.insert(DropdownSettings.CurrentOption, option)
-                                    end
-                                else
-                                    DropdownSettings.CurrentOption = {option}
-                                end
-            
-                                -- Aktualizacja wyświetlanego tekstu
-                                if #DropdownSettings.CurrentOption == 0 then
-                                    Dropdown.Selected.Text = "None"
-                                elseif #DropdownSettings.CurrentOption == 1 then
-                                    Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-                                else
-                                    Dropdown.Selected.Text = "Various"
-                                end
-                            end)
-                        end
+              
+                if DropdownSettings.MultipleOptions then
+                  if #DropdownSettings.CurrentOption == 1 then
+                    Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                  elseif #DropdownSettings.CurrentOption == 0 then
+                    Dropdown.Selected.Text = "None"
+                  else
+                    Dropdown.Selected.Text = "Various"
+                  end
+                else
+                  Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                end
+              
+                local Success, Response = pcall(function()
+                  DropdownSettings.Callback(NewOption)
+                end)
+              
+                if not Success then
+                  TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
+                  TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
+                  Dropdown.Title.Text = "Callback Error"
+                  print("Rayfield | " .. DropdownSettings.Name .. " Callback Error " .. tostring(Response))
+                  wait(0.5)
+                  Dropdown.Title.Text = DropdownSettings.Name
+                  TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+                  TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
+                end
+              
+                for _, droption in ipairs(Dropdown.List:GetChildren()) do
+                  if droption:IsA("Frame") and droption.Name ~= "Placeholder" then
+                    if not table.find(DropdownSettings.CurrentOption, droption.Name) then
+                      droption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
                     else
-                        -- Aktualizacja istniejącej opcji (np. zmiana tekstu)
-                        existingOption.Title.Text = option
-                        -- Możesz dodać tu więcej logiki aktualizacji, jeśli potrzebujesz
+                      droption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
                     end
+                  end
                 end
-            
-                -- Aktualizacja UI poza zdarzeniami
-                -- Tu możesz dodać dodatkową logikę aktualizacji UI, jeśli jest to potrzebne
+              
+                -- SaveConfiguration()
             end
-            
-            
-            if Settings.ConfigurationSaving then
-                if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
-                    RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
-                end
-            end
-            
-            return DropdownSettings
-            end
-            
+              
+
+			if Settings.ConfigurationSaving then
+				if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
+					RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
+				end
+			end
+
+			return DropdownSettings
+		end
 
 		-- Keybind
 		function Tab:CreateKeybind(KeybindSettings)
