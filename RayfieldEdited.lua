@@ -8,7 +8,7 @@ iRay  | Programming
 
 ]]
 
-print(math.random(1,10))
+print(math.random(1,99))
 
 local Release = "Beta 8"
 local NotificationDuration = 6.5
@@ -1937,7 +1937,6 @@ function RayfieldLibrary:CreateWindow(Settings)
             
                     -- Konfiguracja zdarzeń, identyczna jak w CreateDropdown
                     DropdownOption.Interact.MouseButton1Click:Connect(function()
-                        -- Logika wyboru opcji, aktualizacja CurrentOption
                         if DropdownSettings.MultipleOptions then
                             if table.find(DropdownSettings.CurrentOption, option) then
                                 table.remove(DropdownSettings.CurrentOption, table.find(DropdownSettings.CurrentOption, option))
@@ -1964,6 +1963,7 @@ function RayfieldLibrary:CreateWindow(Settings)
                     end)
                 end
             
+                -- Aktualizacja UI dla każdej opcji w Dropdown
                 for _, droption in ipairs(Dropdown.List:GetChildren()) do
                     if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
                         droption.BackgroundColor3 = table.find(DropdownSettings.CurrentOption, droption.Name) and Color3.fromRGB(40, 40, 40) or Color3.fromRGB(30, 30, 30)
