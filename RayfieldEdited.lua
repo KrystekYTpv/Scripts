@@ -8,7 +8,7 @@ iRay  | Programming
 
 ]]
 
-print('1.5')
+print(math.random(1,10))
 
 local Release = "Beta 8"
 local NotificationDuration = 6.5
@@ -1920,12 +1920,14 @@ function RayfieldLibrary:CreateWindow(Settings)
                     NewOption = {NewOption}
                 end
             
+                -- Usuń istniejące opcje
                 for _, child in ipairs(Dropdown.List:GetChildren()) do
                     if child:IsA("Frame") and child.Name ~= "Placeholder" and child.Name ~= "Template" then
                         child:Destroy()
                     end
                 end
             
+                -- Dodaj nowe opcje
                 for _, option in ipairs(NewOption) do
                     local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
                     DropdownOption.Name = option
@@ -1933,46 +1935,33 @@ function RayfieldLibrary:CreateWindow(Settings)
                     DropdownOption.Parent = Dropdown.List
                     DropdownOption.Visible = true
             
-                    local InteractButton = DropdownOption:FindFirstChild("Interact")
-                    if InteractButton then
-                        InteractButton.MouseButton1Click:Connect(function()
-                            if DropdownSettings.MultipleOptions then
-                                local index = table.find(DropdownSettings.CurrentOption, option)
-                                if index then
-                                    table.remove(DropdownSettings.CurrentOption, index)
-                                    DropdownOption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-                                else
-                                    table.insert(DropdownSettings.CurrentOption, option)
-                                    DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                                end
+                    -- Konfiguracja zdarzeń, identyczna jak w CreateDropdown
+                    DropdownOption.Interact.MouseButton1Click:Connect(function()
+                        -- Logika wyboru opcji, aktualizacja CurrentOption
+                        if DropdownSettings.MultipleOptions then
+                            if table.find(DropdownSettings.CurrentOption, option) then
+                                table.remove(DropdownSettings.CurrentOption, table.find(DropdownSettings.CurrentOption, option))
                             else
-                                DropdownSettings.CurrentOption = {option}
-                                for _, child in ipairs(Dropdown.List:GetChildren()) do
-                                    if child:IsA("Frame") and child.Name ~= "Placeholder" then
-                                        child.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-                                    end
-                                end
-                                DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                                table.insert(DropdownSettings.CurrentOption, option)
                             end
+                        else
+                            DropdownSettings.CurrentOption = {option}
+                        end
             
-                            if #DropdownSettings.CurrentOption == 0 then
-                                Dropdown.Selected.Text = "None"
-                            elseif #DropdownSettings.CurrentOption == 1 then
-                                Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-                            else
-                                Dropdown.Selected.Text = "Various"
-                            end
-                        end)
-                    end
-                end
+                        -- Aktualizacja tekstu wybranej opcji
+                        if #DropdownSettings.CurrentOption == 1 then
+                            Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                        elseif #DropdownSettings.CurrentOption == 0 then
+                            Dropdown.Selected.Text = "None"
+                        else
+                            Dropdown.Selected.Text = "Various"
+                        end
             
-                if DropdownSettings.Callback then
-                    local Success, Response = pcall(function()
-                        DropdownSettings.Callback(NewOption)
+                        -- Opcjonalnie: Callback i inne aktualizacje UI
+                        if DropdownSettings.Callback then
+                            DropdownSettings.Callback(DropdownSettings.CurrentOption)
+                        end
                     end)
-                    if not Success then
-                        -- Obsługa błędu callback
-                    end
                 end
             
                 for _, droption in ipairs(Dropdown.List:GetChildren()) do
