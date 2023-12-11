@@ -8,8 +8,7 @@ iRay  | Programming
 
 ]]
 
-print('Wersja 1.2')
-
+warn(1.3)
 
 local Release = "Beta 8"
 local NotificationDuration = 6.5
@@ -1917,50 +1916,52 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			function DropdownSettings:Set(NewOption)
+                -- Konwersja NewOption na tabelę, jeśli to konieczne
                 if typeof(NewOption) == "string" then
                     NewOption = {NewOption}
                 end
             
-                -- Usuwanie istniejących opcji, jeśli to konieczne
-                for _, child in ipairs(Dropdown.List:GetChildren()) do
-                    if child:IsA("Frame") and child.Name ~= "Placeholder" then
-                        child:Destroy()
-                    end
-                end
-            
-                -- Dodawanie nowych opcji
                 for _, option in ipairs(NewOption) do
                     local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
                     DropdownOption.Name = option
                     DropdownOption.Title.Text = option
                     DropdownOption.Parent = Dropdown.List
                     DropdownOption.Visible = true
-            
+                
                     -- Konfiguracja zdarzenia kliknięcia dla każdej opcji
-                    -- (tutaj dodaj logikę zdarzeń)
-                end
-            
-                -- Aktualizacja wybranej opcji
-                if DropdownSettings.MultipleOptions then
-                    DropdownSettings.CurrentOption = NewOption
-                    -- Logika aktualizacji tekstu wybranej opcji
-                else
-                    Dropdown.Selected.Text = NewOption[1] or "None"
-                    DropdownSettings.CurrentOption = {NewOption[1]}
-                end
-            
-                -- Aktualizacja CurrentOption w zależności od tego, czy dopuszczane są MultipleOptions
-                DropdownSettings.CurrentOption = NewOption
-                if DropdownSettings.MultipleOptions then
-                    if #DropdownSettings.CurrentOption == 1 then
-                        Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-                    elseif #DropdownSettings.CurrentOption == 0 then
-                        Dropdown.Selected.Text = "None"
-                    else
-                        Dropdown.Selected.Text = "Various"
-                    end
-                else
-                    Dropdown.Selected.Text = DropdownSettings.CurrentOption[1] or "None"
+                    DropdownOption.Interact.MouseButton1Click:Connect(function()
+                        if DropdownSettings.MultipleOptions then
+                            local index = table.find(DropdownSettings.CurrentOption, option)
+                            if index then
+                                table.remove(DropdownSettings.CurrentOption, index)
+                                DropdownOption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                            else
+                                table.insert(DropdownSettings.CurrentOption, option)
+                                DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                            end
+                
+                            -- Aktualizacja wyświetlanego tekstu dla wielokrotnych opcji
+                            if #DropdownSettings.CurrentOption == 0 then
+                                Dropdown.Selected.Text = "None"
+                            elseif #DropdownSettings.CurrentOption == 1 then
+                                Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                            else
+                                Dropdown.Selected.Text = "Various"
+                            end
+                        else
+                            -- Aktualizacja wybranej opcji dla pojedynczej opcji
+                            DropdownSettings.CurrentOption = {option}
+                            for _, child in ipairs(Dropdown.List:GetChildren()) do
+                                if child:IsA("Frame") and child.Name ~= "Placeholder" then
+                                    child.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                                end
+                            end
+                            DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                
+                            -- Ustawienie tekstu wybranej opcji
+                            Dropdown.Selected.Text = option
+                        end
+                    end)
                 end
             
                 -- Wywołanie Callback, jeśli istnieje
@@ -1969,8 +1970,14 @@ function RayfieldLibrary:CreateWindow(Settings)
                         DropdownSettings.Callback(NewOption)
                     end)
                     if not Success then
-                        -- Obsługa błędów związanych z Callback
-                        -- Istniejący kod obsługi błędów
+                        TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
+						TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
+						Dropdown.Title.Text = "Callback Error"
+						print("Rayfield | "..DropdownSettings.Name.." Callback Error " ..tostring(Response))
+						wait(0.5)
+						Dropdown.Title.Text = DropdownSettings.Name
+						TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+						TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
                     end
                 end
             
