@@ -2092,7 +2092,7 @@ function ArrayFieldLibrary:CreateWindow(Settings)
 			return InputSettings
 		end
 
-		-- Dropdown
+				-- Dropdown
 		function Tab:CreateDropdown(DropdownSettings)
 			local Dropdown = Elements.Template.Dropdown:Clone()
 			local SearchBar = Dropdown.List["-SearchBar"]
@@ -2303,7 +2303,7 @@ function ArrayFieldLibrary:CreateWindow(Settings)
 					end
 
 					local Success, Response = pcall(function()
-						DropdownSettings.Callback(Option)
+						DropdownSettings.Callback({Option})
 					end)
 					if not Success then
 						Error('Callback Error')
