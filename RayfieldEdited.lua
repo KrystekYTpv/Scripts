@@ -1923,6 +1923,22 @@ function RayfieldLibrary:CreateWindow(Settings)
                   DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption}
                 end
               
+                -- Usuń stare opcje z tabeli
+                for _, Option in ipairs(DropdownSettings.CurrentOption) do
+                  if Option ~= NewOption then
+                    DropdownSettings.CurrentOption[Option] = nil
+                  end
+                end
+            
+                -- Dodaj nowe opcje do tabeli
+                if type(NewOption) == "table" then
+                  for _, Option in ipairs(NewOption) do
+                    DropdownSettings.CurrentOption[Option] = true
+                  end
+                else
+                  DropdownSettings.CurrentOption[NewOption] = true
+                end
+
                 if not DropdownSettings.MultipleOptions then
                   DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption[1]}
                 end
