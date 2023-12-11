@@ -1920,14 +1920,12 @@ function RayfieldLibrary:CreateWindow(Settings)
                     NewOption = {NewOption}
                 end
             
-                -- Usuń istniejące opcje
-                for _, child in ipairs(Dropdown.List:GetChildren()) do
-                    if child:IsA("Frame") and child.Name ~= "Placeholder" and child.Name ~= "Template" then
-                        child:Destroy()
-                    end
-                end
+                -- Usuń całą rozwijaną listę i stwórz ją na nowo
+                Dropdown:ClearAllChildren()
+                Dropdown = Elements.Template.Dropdown:Clone()
+                Dropdown.Parent = TabPage
             
-                -- Dodaj nowe opcje
+                -- Dodaj opcje do rozwijanej listy
                 for _, option in ipairs(NewOption) do
                     local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
                     DropdownOption.Name = option
@@ -1935,40 +1933,40 @@ function RayfieldLibrary:CreateWindow(Settings)
                     DropdownOption.Parent = Dropdown.List
                     DropdownOption.Visible = true
             
-                    -- Konfiguracja zdarzeń, identyczna jak w CreateDropdown
-                    DropdownOption.Interact.MouseButton1Click:Connect(function()
-                        if DropdownSettings.MultipleOptions then
-                            if table.find(DropdownSettings.CurrentOption, option) then
-                                table.remove(DropdownSettings.CurrentOption, table.find(DropdownSettings.CurrentOption, option))
+                    -- Dodaj logikę zdarzenia kliknięcia dla każdej opcji
+                    local InteractButton = DropdownOption:FindFirstChild("Interact")
+                    if InteractButton then
+                        InteractButton.MouseButton1Click:Connect(function()
+                            -- Aktualizuj wybrane opcje
+                            if DropdownSettings.MultipleOptions then
+                                local index = table.find(DropdownSettings.CurrentOption, option)
+                                if index then
+                                    table.remove(DropdownSettings.CurrentOption, index)
+                                else
+                                    table.insert(DropdownSettings.CurrentOption, option)
+                                end
                             else
-                                table.insert(DropdownSettings.CurrentOption, option)
+                                DropdownSettings.CurrentOption = {option}
                             end
-                        else
-                            DropdownSettings.CurrentOption = {option}
-                        end
             
-                        -- Aktualizacja tekstu wybranej opcji
-                        if #DropdownSettings.CurrentOption == 1 then
-                            Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-                        elseif #DropdownSettings.CurrentOption == 0 then
-                            Dropdown.Selected.Text = "None"
-                        else
-                            Dropdown.Selected.Text = "Various"
-                        end
+                            -- Aktualizuj wyświetlany tekst
+                            if #DropdownSettings.CurrentOption == 0 then
+                                Dropdown.Selected.Text = "None"
+                            elseif #DropdownSettings.CurrentOption == 1 then
+                                Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+                            else
+                                Dropdown.Selected.Text = "Various"
+                            end
             
-                        -- Opcjonalnie: Callback i inne aktualizacje UI
-                        if DropdownSettings.Callback then
-                            DropdownSettings.Callback(DropdownSettings.CurrentOption)
-                        end
-                    end)
-                end
-            
-                -- Aktualizacja UI dla każdej opcji w Dropdown
-                for _, droption in ipairs(Dropdown.List:GetChildren()) do
-                    if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
-                        droption.BackgroundColor3 = table.find(DropdownSettings.CurrentOption, droption.Name) and Color3.fromRGB(40, 40, 40) or Color3.fromRGB(30, 30, 30)
+                            -- Opcjonalnie: Wywołanie callback
+                            if DropdownSettings.Callback then
+                                DropdownSettings.Callback(DropdownSettings.CurrentOption)
+                            end
+                        end)
                     end
                 end
+            
+                -- Opcjonalnie: Dodatkowa logika UI
             end
             
             if Settings.ConfigurationSaving then
