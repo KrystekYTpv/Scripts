@@ -1917,65 +1917,71 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 
 			function DropdownSettings:Set(NewOption)
-                local CurrentOption = type(NewOption) == "table" and NewOption or {NewOption}
-              
-                -- Remove existing options from the table
-                for _, Option in ipairs(CurrentOption) do
-                  if Option ~= NewOption then
-                    CurrentOption[Option] = nil
-                  end
-                end
-              
-                -- Add new options to the table
-                CurrentOption = type(NewOption) == "table" and CurrentOption or {CurrentOption[1]}
-              
-                if not DropdownSettings.MultipleOptions then
-                  CurrentOption = {CurrentOption[1]}
-                end
-              
-                -- Update the selected option text
-                if DropdownSettings.MultipleOptions then
-                  if #CurrentOption == 1 then
-                    Dropdown.Selected.Text = CurrentOption[1]
-                  elseif #CurrentOption == 0 then
-                    Dropdown.Selected.Text = "None"
-                  else
-                    Dropdown.Selected.Text = "Various"
-                  end
-                else
-                  Dropdown.Selected.Text = CurrentOption[1]
-                end
-              
-                -- Update the callback function
-                local Success, Response = pcall(function()
-                  DropdownSettings.Callback(NewOption)
-                end)
-              
-                if not Success then
-                  TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
-                  TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 1}):Play()
-                  Dropdown.Title.Text = "Callback Error"
-                  print("Rayfield | " .. DropdownSettings.Name .. " Callback Error " .. tostring(Response))
-                  wait(0.5)
-                  Dropdown.Title.Text = DropdownSettings.Name
-                  TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-                  TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0}):Play()
-                end
-              
-                -- Update the option background colors
-                for _, droption in ipairs(Dropdown.List:GetChildren()) do
-                  if droption:IsA("Frame") and droption.Name ~= "Placeholder" then
-                    if not table.find(CurrentOption, droption.Name) then
-                      droption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-                    else
-                      droption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                    end
-                  end
-                end
-              
-                -- Save configuration
-                -- SaveConfiguration()
-              end
+				if typeof(NewOption) == "string" then
+					NewOption = {NewOption}
+				end
+			
+				for _, child in ipairs(Dropdown.List:GetChildren()) do
+					if child:IsA("Frame") and child.Name ~= "Placeholder" and child.Name ~= "Template" then
+						child:Destroy()
+					end
+				end
+			
+				for _, option in ipairs(NewOption) do
+					local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
+					DropdownOption.Name = option
+					DropdownOption.Title.Text = option
+					DropdownOption.Parent = Dropdown.List
+					DropdownOption.Visible = true
+			
+					local InteractButton = DropdownOption:FindFirstChild("Interact")
+					if InteractButton then
+						InteractButton.MouseButton1Click:Connect(function()
+							if DropdownSettings.MultipleOptions then
+								local index = table.find(DropdownSettings.CurrentOption, option)
+								if index then
+									table.remove(DropdownSettings.CurrentOption, index)
+									DropdownOption.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+								else
+									table.insert(DropdownSettings.CurrentOption, option)
+									DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+								end
+							else
+								DropdownSettings.CurrentOption = {option}
+								for _, child in ipairs(Dropdown.List:GetChildren()) do
+									if child:IsA("Frame") and child.Name ~= "Placeholder" then
+										child.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+									end
+								end
+								DropdownOption.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+							end
+			
+							if #DropdownSettings.CurrentOption == 0 then
+								Dropdown.Selected.Text = "None"
+							elseif #DropdownSettings.CurrentOption == 1 then
+								Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+							else
+								Dropdown.Selected.Text = "Various"
+							end
+						end)
+					end
+				end
+			
+				if DropdownSettings.Callback then
+					local Success, Response = pcall(function()
+						DropdownSettings.Callback(NewOption)
+					end)
+					if not Success then
+						-- Obsługa błędu callback
+					end
+				end
+			
+				for _, droption in ipairs(Dropdown.List:GetChildren()) do
+					if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
+						droption.BackgroundColor3 = table.find(DropdownSettings.CurrentOption, droption.Name) and Color3.fromRGB(40, 40, 40) or Color3.fromRGB(30, 30, 30)
+					end
+				end
+			end
               
               
 
